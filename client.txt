@@ -1,0 +1,4 @@
+bimit     = http://bim--it-dev.iabi.biz/
+Client Id = OWYyOTk0NWMtMDdiYi00M2I5LTlhN2YtYWZiZDMwYTI5ZTU4
+Secret    = NWVlNGEzNDYtOTJmNC00ODgwLTg1NGMtMjNjYTlkZjg5YTQw
+redirect  = http://localhost:23456
