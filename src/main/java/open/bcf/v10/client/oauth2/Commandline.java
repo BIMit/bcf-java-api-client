@@ -6,11 +6,7 @@ import com.google.api.client.auth.oauth2.ClientParametersAuthentication;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.JsonObjectParser;
@@ -19,7 +15,6 @@ import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 
 /**
@@ -34,7 +29,7 @@ public class Commandline {
      * Directory to store user credentials.
      */
     private static final java.io.File DATA_STORE_DIR =
-            new java.io.File(System.getProperty("user.home"), ".store/dailymotion_sample");
+            new java.io.File(System.getProperty("user.home"), ".store/datastore");
 
     /**
      * Global instance of the {@link DataStoreFactory}. The best practice is to make it a single
@@ -66,7 +61,8 @@ public class Commandline {
     private static Credential authorize() throws Exception {
         OAuth2ClientCredentials.errorIfNotSpecified();
         // set up authorization code flow
-        AuthorizationCodeFlow flow = new AuthorizationCodeFlow.Builder(BearerToken
+       ;
+        AuthorizationCodeFlow flow = new AuthorizationCodeFlowForIabi( new AuthorizationCodeFlow.Builder(BearerToken
                 .authorizationHeaderAccessMethod(),
                 HTTP_TRANSPORT,
                 JSON_FACTORY,
@@ -74,8 +70,8 @@ public class Commandline {
                 new ClientParametersAuthentication(
                         OAuth2ClientCredentials.API_KEY, OAuth2ClientCredentials.API_SECRET),
                 OAuth2ClientCredentials.API_KEY,
-                AUTHORIZATION_SERVER_URL).setScopes(Arrays.asList(SCOPE))
-                .setDataStoreFactory(DATA_STORE_FACTORY).build();
+                AUTHORIZATION_SERVER_URL)
+                .setDataStoreFactory(DATA_STORE_FACTORY));
         // authorize
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setHost(
                 OAuth2ClientCredentials.DOMAIN).setPort(OAuth2ClientCredentials.PORT).build();
@@ -83,11 +79,14 @@ public class Commandline {
     }
 
     private static void run(HttpRequestFactory requestFactory) throws IOException {
-        DailyMotionUrl url = new DailyMotionUrl("http://bim--it-dev.iabi.biz/bcf/1.0/projects");
+        GenericUrl url = new GenericUrl("http://bim--it-dev.iabi.biz/bcf/1.0/projects");
 
         HttpRequest request = requestFactory.buildGetRequest(url);
-        BcfVersion version = request.execute().parseAs(BcfVersion.class);
-        System.out.println(version);
+        Projects[] projects = request.execute().parseAs(Projects[].class);
+        for (Projects project : projects) {
+            System.out.println(project);
+        }
+
     }
 
     public static void main(String[] args) {
